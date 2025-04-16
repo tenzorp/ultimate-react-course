@@ -6,7 +6,7 @@ const WatchedMovieList = ({ watched }) => {
       ))}
     </ul>
   );
-}
+};
 
 const WatchedMovie = ({ movie }) => {
   return (
@@ -24,11 +24,11 @@ const WatchedMovie = ({ movie }) => {
         </p>
         <p>
           <span>⏳</span>
-          <span>{movie.runtime} min</span>
+          <span>{movie.runtime}</span>
         </p>
       </div>
     </li>
   );
-}
+};
 
 export default WatchedMovieList;
