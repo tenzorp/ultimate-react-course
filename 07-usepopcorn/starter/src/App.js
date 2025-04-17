@@ -10,6 +10,22 @@ import MovieDetails from "./components/MovieDetails";
 
 export const API_KEY = "3d8ed51f";
 
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
 export default function App() {
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
@@ -19,6 +35,8 @@ export default function App() {
   const [error, setError] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
 
+  const debouncedQuery = useDebounce(query, 500);
+
   useEffect(() => {
     const fetchMovies = async () => {
       try {
@@ -26,7 +44,7 @@ export default function App() {
         setError("");
 
         const res = await fetch(
-          `http://www.omdbapi.com/?apikey=${API_KEY}&s=${query}`
+          `http://www.omdbapi.com/?apikey=${API_KEY}&s=${debouncedQuery}`
         );
         if (!res.ok) throw new Error("Something went wrong.");
 
@@ -43,14 +61,13 @@ export default function App() {
       }
     };
 
-    if (query.length < 3) {
+    if (debouncedQuery.length < 3) {
       setMovies([]);
       setError("");
       return;
     }
-
     fetchMovies();
-  }, [query]);
+  }, [debouncedQuery]);
 
   const handleSelectMovie = (id) => {
     setSelectedId((prev) => (id === prev ? null : id));
