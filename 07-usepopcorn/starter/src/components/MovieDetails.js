@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { API_KEY } from "../App";
 import StarRating from "./StarRating";
+import { useKey } from "../hooks/useKey";
 
 const MovieDetails = ({
   selectedId,
   selectedMovieUserRating,
-  onCloseMovies,
+  onCloseMovie,
   onSetWatched,
 }) => {
   const [movie, setMovie] = useState({});
@@ -25,15 +26,6 @@ const MovieDetails = ({
     Director: director,
     Genre: genre,
   } = movie;
-
-  useEffect(() => {
-    const callback = (e) => {
-      if (e.code === "Escape") onCloseMovies(null);
-    };
-
-    document.addEventListener("keydown", callback);
-    return () => document.removeEventListener("keydown", callback);
-  }, [onCloseMovies]);
 
   useEffect(() => {
     const getMovieDetails = async () => {
@@ -62,6 +54,8 @@ const MovieDetails = ({
     return () => (document.title = "usePopcorn");
   }, [title]);
 
+  useKey("Escape", onCloseMovie);
+
   return (
     <div className="details">
       {isLoading && <div className="loader">Loading...</div>}
@@ -69,7 +63,7 @@ const MovieDetails = ({
       {!isLoading && !error && (
         <>
           <header>
-            <button className="btn-back" onClick={onCloseMovies}>
+            <button className="btn-back" onClick={onCloseMovie}>
               &larr;
             </button>
             <img src={poster} alt={`Poster of ${title}`} />
