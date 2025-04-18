@@ -27,6 +27,15 @@ const MovieDetails = ({
   } = movie;
 
   useEffect(() => {
+    const callback = (e) => {
+      if (e.code === "Escape") onCloseMovies(null);
+    };
+
+    document.addEventListener("keydown", callback);
+    return () => document.removeEventListener("keydown", callback);
+  }, [onCloseMovies]);
+
+  useEffect(() => {
     const getMovieDetails = async () => {
       try {
         setIsLoading(true);

@@ -28,7 +28,9 @@ function useDebounce(value, delay) {
 
 export default function App() {
   const [movies, setMovies] = useState([]);
-  const [watched, setWatched] = useState([]);
+  const [watched, setWatched] = useState(
+    () => JSON.parse(localStorage.getItem("watched")) || []
+  );
   const [numResults, setNumResults] = useState(0);
   const [query, setQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -47,9 +49,8 @@ export default function App() {
           `http://www.omdbapi.com/?apikey=${API_KEY}&s=${debouncedQuery}`
         );
         if (!res.ok) throw new Error("Something went wrong.");
-
         const data = await res.json();
-        console.log(data);
+
         if (data.Response === "False") throw new Error("No results found");
         setMovies(data.Search);
         setNumResults(Number(data.totalResults) || 0);
@@ -85,8 +86,13 @@ export default function App() {
       newWatched.push(movie);
     }
 
+    localStorage.setItem("watched", JSON.stringify(newWatched));
     setWatched(newWatched);
     setSelectedId(null);
+  };
+
+  const handleDeleteWatched = (id) => {
+    setWatched((prev) => prev.filter((movie) => movie.imdbID !== id));
   };
 
   return (
@@ -116,7 +122,10 @@ export default function App() {
           ) : (
             <>
               <WatchedSummary watched={watched} />
-              <WatchedMovieList watched={watched} />
+              <WatchedMovieList
+                watched={watched}
+                onDeleteWatched={handleDeleteWatched}
+              />
             </>
           )}
         </Box>
